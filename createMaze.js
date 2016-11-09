@@ -66,7 +66,7 @@ var pathBlocked=function(grid,coord,direction) {
 
 var turnRandomly=function(direction) {
   var shouldTurn=Math.random();
-  if(shouldTurn<0.6)
+  if(shouldTurn<0.4)
     return direction;
   var leftOrRight=Math.random();
   if(leftOrRight>0.5)
@@ -122,9 +122,7 @@ var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
 
 var initCoord=[randomNumber(MAX_ROWS-2)+1,randomNumber(MAX_COLS-2)+1];
 var initDirection=randomDirection();
-console.log(initCoord);
 var mainMaze=createMaze(mainGrid,initCoord,initDirection);
-console.log(mainMaze);
 
 var drawChart=function(maze) {
   var rows=d3.select(".maze")
