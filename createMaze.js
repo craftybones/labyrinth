@@ -21,6 +21,17 @@ var createGrid=function(rows,cols,character) {
   return grid;
 }
 
+var printGrid=function(grid,rows,cols) {
+  var str="";
+  for (var i = 0; i < rows; i++) {
+    for (var j = 0; j < cols; j++) {
+      str+=grid[i][j];
+    }
+    str+="\n";
+  }
+  console.log(str);
+}
+
 var north=[-1,0];
 var south=[1,0];
 var east=[0,1];
@@ -53,12 +64,19 @@ var pathBlocked=function(grid,coord,direction) {
     || (!outOfBounds(inFront,MAX_ROWS,MAX_COLS) && isCoordMazeChar(grid,inFront));
 }
 
+var turnRandomly=function(direction) {
+  var shouldTurn=Math.random();
+  if(shouldTurn<0.2)
+    return direction;
+  var leftOrRight=Math.random();
+  if(leftOrRight>0.5)
+    return directions[direction].leftOf;
+  return directions[direction].rightOf;
+}
+
 var generateMaze=function(grid,coord,direction) {
   var row=coord[0];
   var col=coord[1];
-  var dir=directions[direction].val;
-  var dRow=dir[0];
-  var dCol=dir[1];
 
   if(outOfBounds(coord,MAX_ROWS,MAX_COLS))
     return grid;
@@ -67,25 +85,29 @@ var generateMaze=function(grid,coord,direction) {
   if(pathBlocked(grid,coord,direction))
     return grid;
   grid[row][col]=MAZE_CHAR;
-  grid=generateMaze(grid,[row+dRow,col+dCol],direction);
+  direction=turnRandomly(direction);
+  var inFrontOf=sumOfCoordinates(coord,directions[direction].val);
   var leftOf=sumOfCoordinates(coord,directions[direction].left);
+  var right=directions[direction].rightOf;
   var rightOf=sumOfCoordinates(coord,directions[direction].right);
+  var behind=sumOfCoordinates(coord,directions[right].right);
+  grid=generateMaze(grid,inFrontOf,direction);
   grid=generateMaze(grid,leftOf,directions[direction].leftOf);
   grid=generateMaze(grid,rightOf,directions[direction].rightOf);
+  grid=generateMaze(grid,behind,directions[right].rightOf);
   return grid;
 }
 
 var MAX_ROWS=10;
 var MAX_COLS=10;
-var MAIN_CHAR=".";
-var MAZE_CHAR="0";
+var MAIN_CHAR=" ";
+var MAZE_CHAR="X";
 
 var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
-mainGrid[0][4]=MAZE_CHAR;
 
 var initCoord=[randomNumber(MAX_ROWS),randomNumber(MAX_COLS)];
 var initDirection=randomDirection();
 var maze=generateMaze(mainGrid,initCoord,initDirection);
-// console.log(initDirection);
-// console.log(initCoord);
-console.log(maze);
+console.log(initDirection);
+console.log(initCoord);
+printGrid(maze,MAX_ROWS,MAX_COLS);
