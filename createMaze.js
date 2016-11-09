@@ -1,3 +1,5 @@
+var _SEQ=0;
+
 var randomNumber=function(max) {
   return Math.floor(Math.random()*max);
 }
@@ -117,8 +119,8 @@ var createMaze=function(grid,initCoord,initDir) {
   return {grid: grid, start: [startingRows[startRow],0], end: [endingRows[endRow],MAX_COLS-1]};
 }
 
-var MAX_ROWS=8;
-var MAX_COLS=8;
+var MAX_ROWS=50;
+var MAX_COLS=50;
 var MAIN_CHAR="-";
 var MAZE_CHAR="X";
 
@@ -128,21 +130,35 @@ var initCoord=[randomNumber(MAX_ROWS-2)+1,randomNumber(MAX_COLS-2)+1];
 var initDirection=randomDirection();
 var mainMaze=createMaze(mainGrid,initCoord,initDirection);
 
-// var drawChart=function(maze) {
-//   var rows=d3.select(".maze")
-//     .selectAll("tr")
-//     .data(maze.grid)
-//     .enter()
-//     .append("tr");
-//   rows.selectAll("td")
-//     .data(function(d){return d})
-//     .enter()
-//     .append("td")
-//     .attr("class",function(d,i){
-//       return d==MAZE_CHAR?"path":"empty";
-//     });
-// }
+var drawChart=function(maze) {
+  var rows=d3.select(".maze")
+    .selectAll("tr")
+    .data(maze.grid)
+    .enter()
+    .append("tr");
+  rows.selectAll("td")
+    .data(function(d){return d})
+    .enter()
+    .append("td")
+    .attr("class",function(d,i){
+      return d==MAZE_CHAR?"path":"empty";
+    });
+}
 
+var drawSolution=function(solution) {
+  var rows=d3.select(".maze").selectAll("tr")._groups[0];
+  solution.forEach(function(s){
+    rows[s[0]].childNodes[s[1]].className="solution";
+  });
+}
+
+var drawCell=function(r,c,cl) {
+  _SEQ+=1;
+  setTimeout(function(){
+    var rows=d3.select(".maze").selectAll("tr")._groups[0];
+    rows[r].childNodes[c].className=cl;
+  },_SEQ*20);
+}
 var isSameCoord=function(c1,c2) {
   return (c1[0]==c2[0])&&(c1[1]==c2[1]);
 }
@@ -154,6 +170,7 @@ var solveMaze=function(grid,start,stop,solution) {
   }
   if(isSameCoord(start,stop)) {
     solution.push(stop);
+    drawCell(stop[0],stop[1],"solution");
     return solution;
   }
   var r=start[0];
@@ -164,6 +181,7 @@ var solveMaze=function(grid,start,stop,solution) {
   if(grid[r][c]!= MAZE_CHAR)
     return undefined;
   solution.push(start);
+  drawCell(r,c,"solution");
   if(solveMaze(grid,[r+1,c],stop,solution))
     return solution;
   if(solveMaze(grid,[r,c+1],stop,solution))
@@ -173,13 +191,14 @@ var solveMaze=function(grid,start,stop,solution) {
   if(solveMaze(grid,[r,c-1],stop,solution))
     return solution;
   solution.pop();
+  drawCell(r,c,"path");
   return undefined;
 }
 
 var solve=function(maze) {
-  return solveMaze(maze.grid,maze.start,maze.end,[]);
+  return solveMaze(maze.grid,maze.start,maze.end,[],0);
 }
 
-// drawChart(mainMaze);
-console.log(mainMaze.grid);
-console.log(solve(mainMaze));
+drawChart(mainMaze);
+var solution=solve(mainMaze);
+// drawSolution(solution);
