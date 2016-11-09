@@ -111,7 +111,7 @@ var createMaze=function(grid,initCoord,initDir) {
   var startRow=randomNumber(startingRows.length);
   grid[startingRows[startRow]][0]=MAZE_CHAR;
   var endRow=randomNumber(endingRows.length)
-  var randomEndingRow=grid[endRow];
+  var randomEndingRow=grid[endingRows[endRow]];
   randomEndingRow.pop();
   randomEndingRow.push(MAZE_CHAR);
   return {grid: grid, start: [startingRows[startRow],0], end: [endingRows[endRow],MAX_COLS-1]};
@@ -146,13 +146,16 @@ var mainMaze=createMaze(mainGrid,initCoord,initDirection);
 var isSameCoord=function(c1,c2) {
   return (c1[0]==c2[0])&&(c1[1]==c2[1]);
 }
+
 var solveMaze=function(grid,start,stop,solution) {
   for (var i = 0; i < solution.length; i++) {
     if(isSameCoord(solution[i],start))
       return undefined;
   }
-  if(isSameCoord(start,stop))
+  if(isSameCoord(start,stop)) {
+    solution.push(stop);
     return solution;
+  }
   var r=start[0];
   var c=start[1];
 
