@@ -47,7 +47,7 @@ var directions={
 var outOfBounds=function(coord,mx,my) {
   var x=coord[0];
   var y=coord[1];
-  return (x<0 || y<0 || x>=mx || y>=my);
+  return (x<1 || y<1 || x>=(mx-1) || y>=(my-1));
 }
 
 var isCoordMazeChar=function(grid,coord) {
@@ -66,7 +66,7 @@ var pathBlocked=function(grid,coord,direction) {
 
 var turnRandomly=function(direction) {
   var shouldTurn=Math.random();
-  if(shouldTurn<0.5)
+  if(shouldTurn<0.6)
     return direction;
   var leftOrRight=Math.random();
   if(leftOrRight>0.5)
@@ -74,7 +74,7 @@ var turnRandomly=function(direction) {
   return directions[direction].rightOf;
 }
 
-var generateMaze=function(grid,coord,direction) {
+var createMazePath=function(grid,coord,direction) {
   var row=coord[0];
   var col=coord[1];
 
@@ -91,24 +91,40 @@ var generateMaze=function(grid,coord,direction) {
   var right=directions[direction].rightOf;
   var rightOf=sumOfCoordinates(coord,directions[direction].right);
   var behind=sumOfCoordinates(coord,directions[right].right);
-  grid=generateMaze(grid,inFrontOf,direction);
-  grid=generateMaze(grid,leftOf,directions[direction].leftOf);
-  grid=generateMaze(grid,rightOf,directions[direction].rightOf);
-  grid=generateMaze(grid,behind,directions[right].rightOf);
+  grid=createMazePath(grid,inFrontOf,direction);
+  grid=createMazePath(grid,leftOf,directions[direction].leftOf);
+  grid=createMazePath(grid,rightOf,directions[direction].rightOf);
+  grid=createMazePath(grid,behind,directions[right].rightOf);
   return grid;
 }
 
-var MAX_ROWS=30;
-var MAX_COLS=30;
+var createMaze=function(grid,initCoord,initDir) {
+  var grid=createMazePath(grid,initCoord,initDir);
+  var startingRows=grid.filter(function(r,i){
+    return r[1]==MAZE_CHAR;
+  });
+  var endingRows=grid.filter(function(r,i){
+    return r[r.length-2]==MAZE_CHAR;
+  });
+  startingRows[randomNumber(startingRows.length)][0]=MAZE_CHAR;
+  var randomEndingRow=endingRows[randomNumber(endingRows.length)];
+  randomEndingRow.pop();
+  randomEndingRow.push(MAZE_CHAR);
+  return grid;
+}
+
+var MAX_ROWS=50;
+var MAX_COLS=50;
 var MAIN_CHAR=" ";
 var MAZE_CHAR="X";
 
 var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
 
-var initCoord=[randomNumber(MAX_ROWS),randomNumber(MAX_COLS)];
+var initCoord=[randomNumber(MAX_ROWS-2)+1,randomNumber(MAX_COLS-2)+1];
 var initDirection=randomDirection();
-var mainMaze=generateMaze(mainGrid,initCoord,initDirection);
-
+console.log(initCoord);
+var mainMaze=createMaze(mainGrid,initCoord,initDirection);
+console.log(mainMaze);
 
 var drawChart=function(maze) {
   var rows=d3.select(".maze")

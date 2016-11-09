@@ -1,12 +1,15 @@
+table {
+  border-collapse: collapse;
+}
 .maze td {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 .empty {
-  background-color: white;
+  background-color: lightgray;
 }
 
 .path {
-  background-color: gray;  
+  background-color: gray;
 }
