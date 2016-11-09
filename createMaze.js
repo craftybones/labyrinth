@@ -66,7 +66,7 @@ var pathBlocked=function(grid,coord,direction) {
 
 var turnRandomly=function(direction) {
   var shouldTurn=Math.random();
-  if(shouldTurn<0.2)
+  if(shouldTurn<0.5)
     return direction;
   var leftOrRight=Math.random();
   if(leftOrRight>0.5)
@@ -98,8 +98,8 @@ var generateMaze=function(grid,coord,direction) {
   return grid;
 }
 
-var MAX_ROWS=10;
-var MAX_COLS=10;
+var MAX_ROWS=30;
+var MAX_COLS=30;
 var MAIN_CHAR=" ";
 var MAZE_CHAR="X";
 
@@ -107,7 +107,22 @@ var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
 
 var initCoord=[randomNumber(MAX_ROWS),randomNumber(MAX_COLS)];
 var initDirection=randomDirection();
-var maze=generateMaze(mainGrid,initCoord,initDirection);
-console.log(initDirection);
-console.log(initCoord);
-printGrid(maze,MAX_ROWS,MAX_COLS);
+var mainMaze=generateMaze(mainGrid,initCoord,initDirection);
+
+
+var drawChart=function(maze) {
+  var rows=d3.select(".maze")
+    .selectAll("tr")
+    .data(maze)
+    .enter()
+    .append("tr");
+  rows.selectAll("td")
+    .data(function(d){return d})
+    .enter()
+    .append("td")
+    .attr("class",function(d,i){
+      return d==MAZE_CHAR?"path":"empty";
+    });
+}
+
+drawChart(mainMaze);

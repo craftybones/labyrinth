@@ -1,0 +1,12 @@
+.maze td {
+  width: 10px;
+  height: 10px;
+}
+
+.empty {
+  background-color: white;
+}
+
+.path {
+  background-color: gray;  
+}
