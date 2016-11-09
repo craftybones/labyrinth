@@ -124,19 +124,16 @@ var MAX_COLS=90;
 var MAIN_CHAR="-";
 var MAZE_CHAR="X";
 
-var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
-
-var initCoord=[randomNumber(MAX_ROWS-2)+1,randomNumber(MAX_COLS-2)+1];
-var initDirection=randomDirection();
-var mainMaze=createMaze(mainGrid,initCoord,initDirection);
 
 var drawChart=function(maze) {
+  d3.select(".maze").selectAll("tr").remove();
   var rows=d3.select(".maze")
     .selectAll("tr")
-    .data(maze.grid)
-    .enter()
-    .append("tr");
-  rows.selectAll("td")
+    .data(maze.grid);
+
+  rows.enter()
+    .append("tr")
+    .selectAll("td")
     .data(function(d){return d})
     .enter()
     .append("td")
@@ -145,18 +142,13 @@ var drawChart=function(maze) {
     });
 }
 
-var drawSolution=function(solution) {
-  var rows=d3.select(".maze").selectAll("tr")._groups[0];
-  solution.forEach(function(s){
-    rows[s[0]].childNodes[s[1]].className="solution";
-  });
-}
-
-var drawCell=function(r,c,cl) {
+var drawCell=function(r,c,cl,finished) {
   _SEQ+=1;
   setTimeout(function(){
     var rows=d3.select(".maze").selectAll("tr")._groups[0];
     rows[r].childNodes[c].className=cl;
+    if(finished)
+      drawNewMaze();
   },_SEQ*5);
 }
 var isSameCoord=function(c1,c2) {
@@ -170,7 +162,7 @@ var solveMaze=function(grid,start,stop,solution) {
   }
   if(isSameCoord(start,stop)) {
     solution.push(stop);
-    drawCell(stop[0],stop[1],"solution");
+    drawCell(stop[0],stop[1],"solution",true);
     return solution;
   }
   var r=start[0];
@@ -198,7 +190,17 @@ var solveMaze=function(grid,start,stop,solution) {
 var solve=function(maze) {
   return solveMaze(maze.grid,maze.start,maze.end,[],0);
 }
+var drawNewMaze=function() {
+  setTimeout(function(){
+    _SEQ=0;
+    var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
 
-drawChart(mainMaze);
-var solution=solve(mainMaze);
-// drawSolution(solution);
+    var initCoord=[randomNumber(MAX_ROWS-2)+1,randomNumber(MAX_COLS-2)+1];
+    var initDirection=randomDirection();
+    var mainMaze=createMaze(mainGrid,initCoord,initDirection);
+    drawChart(mainMaze);
+    solve(mainMaze);
+  },2000);
+}
+
+drawNewMaze();
