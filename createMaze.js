@@ -27,10 +27,10 @@ var east=[0,1];
 var west=[0,-1];
 
 var directions={
-  north: {val: north, left: west, right: east},
-  south: {val: south, left: east, right: west},
-  east: {val: east, left: south, right: north},
-  west: {val: west, left: north, right: south}
+  north: {val: north, left: west, right: east, leftOf: "west", rightOf: "east"},
+  south: {val: south, left: east, right: west, leftOf: "east", rightOf: "west"},
+  east: {val: east, left: south, right: north, leftOf: "south", rightOf: "north"},
+  west: {val: west, left: north, right: south, leftOf: "north", rightOf: "south"}
 };
 
 var outOfBounds=function(coord,mx,my) {
@@ -68,20 +68,24 @@ var generateMaze=function(grid,coord,direction) {
     return grid;
   grid[row][col]=MAZE_CHAR;
   grid=generateMaze(grid,[row+dRow,col+dCol],direction);
+  var leftOf=sumOfCoordinates(coord,directions[direction].left);
+  var rightOf=sumOfCoordinates(coord,directions[direction].right);
+  grid=generateMaze(grid,leftOf,directions[direction].leftOf);
+  grid=generateMaze(grid,rightOf,directions[direction].rightOf);
   return grid;
 }
 
-var MAX_ROWS=5;
-var MAX_COLS=5;
-var MAIN_CHAR="-";
-var MAZE_CHAR="X";
+var MAX_ROWS=10;
+var MAX_COLS=10;
+var MAIN_CHAR=".";
+var MAZE_CHAR="0";
 
 var mainGrid=createGrid(MAX_ROWS,MAX_COLS,MAIN_CHAR);
 mainGrid[0][4]=MAZE_CHAR;
 
 var initCoord=[randomNumber(MAX_ROWS),randomNumber(MAX_COLS)];
 var initDirection=randomDirection();
-var maze=generateMaze(mainGrid,[0,0],"east");
+var maze=generateMaze(mainGrid,initCoord,initDirection);
 // console.log(initDirection);
 // console.log(initCoord);
 console.log(maze);
