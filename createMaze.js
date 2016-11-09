@@ -68,7 +68,7 @@ var pathBlocked=function(grid,coord,direction) {
 
 var turnRandomly=function(direction) {
   var shouldTurn=Math.random();
-  if(shouldTurn<0.4)
+  if(shouldTurn<0.2)
     return direction;
   var leftOrRight=Math.random();
   if(leftOrRight>0.5)
@@ -119,8 +119,8 @@ var createMaze=function(grid,initCoord,initDir) {
   return {grid: grid, start: [startingRows[startRow],0], end: [endingRows[endRow],MAX_COLS-1]};
 }
 
-var MAX_ROWS=50;
-var MAX_COLS=50;
+var MAX_ROWS=90;
+var MAX_COLS=90;
 var MAIN_CHAR="-";
 var MAZE_CHAR="X";
 
@@ -157,7 +157,7 @@ var drawCell=function(r,c,cl) {
   setTimeout(function(){
     var rows=d3.select(".maze").selectAll("tr")._groups[0];
     rows[r].childNodes[c].className=cl;
-  },_SEQ*20);
+  },_SEQ*5);
 }
 var isSameCoord=function(c1,c2) {
   return (c1[0]==c2[0])&&(c1[1]==c2[1]);
